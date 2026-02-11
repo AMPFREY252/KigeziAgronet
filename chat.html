@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="no-js" lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="assets/css/layouts.css" />
   <link rel="stylesheet" href="assets/css/chat-styles.css" />
 
-  <!-- Added CSS for message scroll -->
+  <!-- Added CSS for message scroll and responsiveness -->
   <style>
     #messagesArea {
       max-height: 60vh; /* Adjust height as needed */
@@ -25,22 +25,38 @@
       display: flex;
       flex-direction: column;
     }
+    @media (max-width: 768px) {
+      .chat-container {
+        flex-direction: column;
+      }
+      .chat-sidebar {
+        width: 100%;
+      }
+      .chat-main {
+        width: 100%;
+      }
+    }
+    button.btn.btn-icon {
+      min-width: 48px;
+      min-height: 48px;
+      font-size: 20px;
+    }
   </style>
 </head>
 <body class="clean-layout">
   <div class="container">
     <!-- Back Button -->
     <div class="page-top">
-      <a href="index.html" class="back-button">
+      <a href="index.html" class="back-button" aria-label="Back to Home">
         <i class="fas fa-arrow-left"></i>
         <span>Back to Home</span>
       </a>
-      <div class="page-menu">
-        <a href="market.html"><i class="fas fa-shopping-cart"></i> Market</a>
-        <a href="weather.html"><i class="fas fa-cloud-sun"></i> Weather</a>
-        <a href="pests.html"><i class="fas fa-bug"></i> Pest Alerts</a>
-        <a href="chat.html"><i class="fas fa-comments"></i> Chat</a>
-        <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+      <div class="page-menu" role="navigation" aria-label="Main Menu">
+        <a href="market.html" aria-current="false"><i class="fas fa-shopping-cart"></i> Market</a>
+        <a href="weather.html" aria-current="false"><i class="fas fa-cloud-sun"></i> Weather</a>
+        <a href="pests.html" aria-current="false"><i class="fas fa-bug"></i> Pest Alerts</a>
+        <a href="chat.html" aria-current="page"><i class="fas fa-comments"></i> Chat</a>
+        <a href="profile.html" aria-current="false"><i class="fas fa-user"></i> Profile</a>
       </div>
     </div>
     <!-- Page Header -->
@@ -50,73 +66,79 @@
     </header>
     <!-- Toast Notification -->
     <div id="toast"></div>
-    <main class="clean-content chat-container animate-fade-up">
+    <main class="clean-content chat-container animate-fade-up" role="main" aria-label="Chat Interface" style="display: flex; flex-direction: row; flex-wrap: nowrap;">
       <!-- Chat Sidebar -->
-      <div class="chat-sidebar">
-        <div class="sidebar-header">
+      <div class="chat-sidebar" style="width: 300px; min-width: 250px; max-width: 350px; flex-shrink: 0;">
+        <div class="sidebar-header" style="display:flex; justify-content: space-between; align-items:center; padding: 1em;">
           <h2>Conversations</h2>
-          <button class="btn btn-icon" id="newChatBtn" title="Start new chat">
+          <button class="btn btn-icon" id="newChatBtn" title="Start new chat" aria-label="Start new chat" style="min-width:48px; min-height:48px;">
             <i class="fas fa-plus"></i>
           </button>
         </div>
-
-        <div class="search-box">
-          <i class="fas fa-search"></i>
-          <input type="text" id="searchChats" placeholder="Search conversations..." />
+        <div class="search-box" style="display:flex; align-items:center; padding: 0 1em;">
+          <i class="fas fa-search" aria-hidden="true"></i>
+          <input type="text" id="searchChats" placeholder="Search conversations..." aria-label="Search conversations" style="width: 100%; margin-left: 0.5em; padding: 0.5em; font-size: 1em;" />
         </div>
-
-        <div class="chats-list" id="chatsList">
+        <div class="chats-list" id="chatsList" style="overflow-y:auto; flex:1; padding: 1em;">
           <!-- Conversations will be dynamically loaded here -->
         </div>
       </div>
 
       <!-- Chat Main Area -->
-      <div class="chat-main">
+      <div class="chat-main" style="flex:1; display:flex; flex-direction:column; height:100vh;">
         <!-- Chat Header -->
-        <div class="chat-header">
-          <div class="chat-header-left">
-            <button class="btn btn-icon" id="backToList" style="display: none;">
+        <div class="chat-header" style="display:flex; justify-content:space-between; align-items:center; padding:1em; border-bottom:1px solid #ccc;">
+          <div class="chat-header-left" style="display:flex; align-items:center;">
+            <button class="btn btn-icon" id="backToList" style="display:none; min-width:48px; min-height:48px;" aria-label="Back to conversation list">
               <i class="fas fa-arrow-left"></i>
             </button>
-            <div class="chat-header-info">
+            <div class="chat-header-info" style="margin-left:1em;">
               <h2 id="chatHeaderName">John Farmer</h2>
-              <div class="chat-header-status">
+              <div class="chat-header-status" style="display:flex; align-items:center; font-size:0.9em;">
                 <span class="status-indicator online"></span>
                 <span id="chatHeaderStatus">Online</span>
               </div>
             </div>
           </div>
-          <div class="chat-header-right">
-            <button class="btn btn-icon" title="Call">
+          <div class="chat-header-right" style="display:flex; gap:0.5em;">
+            <button class="btn btn-icon" title="Call" aria-label="Call">
               <i class="fas fa-phone"></i>
             </button>
-            <button class="btn btn-icon" title="Video Call">
+            <button class="btn btn-icon" title="Video Call" aria-label="Video Call">
               <i class="fas fa-video"></i>
             </button>
-            <button class="btn btn-icon" title="More options">
+            <button class="btn btn-icon" title="More options" aria-label="More options">
               <i class="fas fa-ellipsis-v"></i>
             </button>
           </div>
         </div>
 
         <!-- Messages Area -->
-        <div class="chat-messages" id="messagesArea">
+        <div class="chat-messages" id="messagesArea" style="flex:1; padding:1em; overflow-y:auto;">
           <div class="message-date-separator"><span>Today</span></div>
           <!-- Messages will be loaded here -->
         </div>
 
         <!-- Chat Input -->
-        <div class="chat-input-area">
-          <div class="input-actions">
-            <button class="btn btn-icon" id="attachBtn" title="Attach file"><i class="fas fa-paperclip"></i></button>
-            <button class="btn btn-icon" id="emojiBtn" title="Emoji"><i class="fas fa-smile"></i></button>
+        <div class="chat-input-area" style="display:flex; align-items:center; padding:1em; border-top:1px solid #ccc;">
+          <div class="input-actions" style="display:flex; gap:0.5em;">
+            <button class="btn btn-icon" id="attachBtn" title="Attach file" aria-label="Attach file" style="min-width:48px; min-height:48px;">
+              <i class="fas fa-paperclip"></i>
+            </button>
+            <button class="btn btn-icon" id="emojiBtn" title="Emoji" aria-label="Emoji" style="min-width:48px; min-height:48px;">
+              <i class="fas fa-smile"></i>
+            </button>
           </div>
-          <div class="input-wrapper">
-            <input type="text" id="messageInput" class="message-input" placeholder="Type your message here..." autocomplete="off" />
+          <div class="input-wrapper" style="flex:1; margin: 0 1em;">
+            <input type="text" id="messageInput" class="message-input" placeholder="Type your message here..." aria-label="Type your message" style="width: 100%; padding: 0.75em; font-size: 1em; border: 1px solid #ccc; border-radius: 4px;" />
           </div>
-          <div class="input-actions">
-            <button class="btn btn-icon" id="recordBtn" title="Voice message"><i class="fas fa-microphone"></i></button>
-            <button class="btn btn-primary btn-send" id="sendBtn" title="Send message"><i class="fas fa-paper-plane"></i></button>
+          <div class="input-actions" style="display:flex; gap:0.5em;">
+            <button class="btn btn-icon" id="recordBtn" title="Voice message" aria-label="Voice message" style="min-width:48px; min-height:48px;">
+              <i class="fas fa-microphone"></i>
+            </button>
+            <button class="btn btn-primary btn-send" id="sendBtn" title="Send message" aria-label="Send message" style="min-width:48px; min-height:48px;">
+              <i class="fas fa-paper-plane"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -132,7 +154,7 @@
     const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
     // Current chat info
-    let currentChatId = 'default-chat'; // replace or set dynamically
+    let currentChatId = 'default-chat'; // should be set dynamically after selecting a chat
     let currentChatName = 'John Farmer';
 
     // User info
@@ -148,12 +170,13 @@
       await populateChats();
     };
 
-    // Load previous messages
+    // Load previous messages (filter by conversation_id)
     async function loadMessages() {
+      // Replace 'conversation_id' with your actual column name in your database
       const { data, error } = await supabase
         .from('messages')
         .select('*')
-        .eq('id', currentChatId)
+        .eq('conversation_id', currentChatId)
         .order('created_at', { ascending: true });
       
       const messagesArea = document.getElementById('messagesArea');
@@ -177,6 +200,7 @@
         console.error(error);
         return;
       }
+      // Deduplicate chats by user_id
       const uniqueChats = {};
       data.forEach(msg => {
         if (!uniqueChats[msg.user_id]) {
@@ -196,10 +220,10 @@
         chatItem.setAttribute('data-chat-name', chat.name);
         chatItem.innerHTML = `
           <div class="chat-item-avatar">
-            <img src="${chat.avatar}" alt="${chat.name}" />
+            <img src="${chat.avatar}" alt="${chat.name}" style="width:50px; height:50px; border-radius:50%; object-fit:cover;">
           </div>
           <div class="chat-item-content">
-            <div class="chat-item-header">
+            <div class="chat-item-header" style="display:flex; justify-content:space-between;">
               <span class="chat-item-name">${chat.name}</span>
               <span class="chat-item-time">Loading...</span>
             </div>
@@ -222,6 +246,8 @@
 
       const messageDiv = document.createElement('div');
       messageDiv.className = `message ${isUser ? 'sent' : 'received'} animate-slide-in-right`;
+      messageDiv.setAttribute('role', 'region');
+      messageDiv.setAttribute('aria-label', isUser ? 'Sent message' : 'Received message');
 
       const messageContent = document.createElement('div');
       messageContent.className = 'message-content';
@@ -262,7 +288,8 @@
           name: currentUser.name,
           avatar: currentUser.avatar,
           content: text,
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
+          conversation_id: currentChatId  // ensure this field exists in your table
         }]);
 
       if (error) {
@@ -309,5 +336,4 @@
   </script>
   <script src="../assets/js/theme-switcher.js"></script>
 </body>
-
 </html>
