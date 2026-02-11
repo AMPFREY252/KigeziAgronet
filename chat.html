@@ -7,89 +7,115 @@
   <meta name="description" content="Kigezi Agronet - Chat" />
   <meta name="theme-color" content="#166534" />
 
-  <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" href="assets/images/favicon.ico" />
+  <link rel="manifest" href="../manifest.webmanifest" />
+  <link rel="icon" href="../assets/images/favicon.ico" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/clean-layout.css" />
-  <link rel="stylesheet" href="assets/css/enhanced-styles.css" />
-  <link rel="stylesheet" href="assets/css/layouts.css" />
-  <link rel="stylesheet" href="assets/css/chat-styles.css" />
+  <link rel="stylesheet" href="../assets/css/clean-layout.css" />
+  <link rel="stylesheet" href="../assets/css/enhanced-styles.css" />
+  <link rel="stylesheet" href="../assets/css/layouts.css" />
+  <link rel="stylesheet" href="../assets/css/chat-styles.css" />
 
   <!-- Added CSS for message scroll and responsiveness -->
   <style>
+    /* Make chat messages scrollable with max height */
     #messagesArea {
       max-height: 60vh; /* Adjust height as needed */
       overflow-y: auto; /* Enables vertical scrollbar */
       display: flex;
       flex-direction: column;
     }
-    @media (max-width: 768px) {
+
+    /* Responsive adjustments */
+    @media(max-width: 768px) {
+      body {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        margin: 0;
+      }
       .chat-container {
         flex-direction: column;
+        height: 100%;
       }
       .chat-sidebar {
         width: 100%;
+        min-height: 200px;
+        max-height: 300px;
+        overflow-y: auto;
+        border-bottom: 1px solid #ccc;
       }
       .chat-main {
-        width: 100%;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      .chat-header, .chat-input-area {
+        padding: 0.5em;
+      }
+      /* Hide back button when not needed */
+      #backToList {
+        display: inline-block;
       }
     }
-    button.btn.btn-icon {
-      min-width: 48px;
-      min-height: 48px;
-      font-size: 20px;
+
+    /* Ensure the message input expands on small screens */
+    .message-input {
+      width: 100%;
     }
   </style>
 </head>
 <body class="clean-layout">
-  <div class="container">
-    <!-- Back Button -->
-    <div class="page-top">
-      <a href="index.html" class="back-button" aria-label="Back to Home">
+  <div class="container" style="height: 100%; display: flex; flex-direction: column;">
+    <!-- Back Button and Menu -->
+    <div class="page-top" style="display:flex; justify-content: space-between; align-items:center; padding:1em; flex-shrink:0;">
+      <a href="index.html" class="back-button" style="display:flex; align-items:center; gap:0.5em;">
         <i class="fas fa-arrow-left"></i>
         <span>Back to Home</span>
       </a>
-      <div class="page-menu" role="navigation" aria-label="Main Menu">
-        <a href="market.html" aria-current="false"><i class="fas fa-shopping-cart"></i> Market</a>
-        <a href="weather.html" aria-current="false"><i class="fas fa-cloud-sun"></i> Weather</a>
-        <a href="pests.html" aria-current="false"><i class="fas fa-bug"></i> Pest Alerts</a>
-        <a href="chat.html" aria-current="page"><i class="fas fa-comments"></i> Chat</a>
-        <a href="profile.html" aria-current="false"><i class="fas fa-user"></i> Profile</a>
+      <div class="page-menu" style="display:flex; gap:1em; flex-wrap:wrap;">
+        <a href="market.html"><i class="fas fa-shopping-cart"></i> Market</a>
+        <a href="weather.html"><i class="fas fa-cloud-sun"></i> Weather</a>
+        <a href="pests.html"><i class="fas fa-bug"></i> Pest Alerts</a>
+        <a href="chat.html" style="background:#166534; color:#fff; padding:0.5em; border-radius:4px;"><i class="fas fa-comments"></i> Chat</a>
+        <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
       </div>
     </div>
     <!-- Page Header -->
-    <header class="page-header">
+    <header class="page-header" style="padding:1em; text-align:center;">
       <h1>Chat</h1>
       <p class="page-description">Kigezi Agronet - Chat</p>
     </header>
+
     <!-- Toast Notification -->
     <div id="toast"></div>
-    <main class="clean-content chat-container animate-fade-up" role="main" aria-label="Chat Interface" style="display: flex; flex-direction: row; flex-wrap: nowrap;">
+
+    <!-- Main Chat Area -->
+    <div class="chat-container" style="flex:1; display:flex; flex-direction:row; min-height:0;">
       <!-- Chat Sidebar -->
-      <div class="chat-sidebar" style="width: 300px; min-width: 250px; max-width: 350px; flex-shrink: 0;">
-        <div class="sidebar-header" style="display:flex; justify-content: space-between; align-items:center; padding: 1em;">
-          <h2>Conversations</h2>
-          <button class="btn btn-icon" id="newChatBtn" title="Start new chat" aria-label="Start new chat" style="min-width:48px; min-height:48px;">
+      <div class="chat-sidebar" style="width:300px; min-width:200px; max-width:350px; flex-shrink:0; display:flex; flex-direction:column; border-right:1px solid #ccc; background:#f9f9f9;">
+        <div class="sidebar-header" style="display:flex; justify-content:space-between; align-items:center; padding:1em;">
+          <h2 style="margin:0;">Conversations</h2>
+          <button class="btn btn-icon" id="newChatBtn" title="Start new chat" style="min-width:48px; min-height:48px;">
             <i class="fas fa-plus"></i>
           </button>
         </div>
-        <div class="search-box" style="display:flex; align-items:center; padding: 0 1em;">
-          <i class="fas fa-search" aria-hidden="true"></i>
-          <input type="text" id="searchChats" placeholder="Search conversations..." aria-label="Search conversations" style="width: 100%; margin-left: 0.5em; padding: 0.5em; font-size: 1em;" />
+        <div class="search-box" style="display:flex; align-items:center; padding:0 1em; margin-bottom:1em;">
+          <i class="fas fa-search"></i>
+          <input type="text" id="searchChats" placeholder="Search conversations..." style="width:100%; margin-left:0.5em; padding:0.5em; font-size:1em; border:1px solid #ccc; border-radius:4px;" />
         </div>
-        <div class="chats-list" id="chatsList" style="overflow-y:auto; flex:1; padding: 1em;">
-          <!-- Conversations will be dynamically loaded here -->
+        <div class="chats-list" id="chatsList" style="overflow-y:auto; flex:1; padding:0 1em;">
+          <!-- Conversations dynamically loaded -->
         </div>
       </div>
 
-      <!-- Chat Main Area -->
-      <div class="chat-main" style="flex:1; display:flex; flex-direction:column; height:100vh;">
-        <!-- Chat Header -->
+      <!-- Chat Main -->
+      <div class="chat-main" style="flex:1; display:flex; flex-direction:column; height:100%;">
+        <!-- Header -->
         <div class="chat-header" style="display:flex; justify-content:space-between; align-items:center; padding:1em; border-bottom:1px solid #ccc;">
           <div class="chat-header-left" style="display:flex; align-items:center;">
-            <button class="btn btn-icon" id="backToList" style="display:none; min-width:48px; min-height:48px;" aria-label="Back to conversation list">
+            <button class="btn btn-icon" id="backToList" style="display:none; min-width:48px; min-height:48px;">
               <i class="fas fa-arrow-left"></i>
             </button>
             <div class="chat-header-info" style="margin-left:1em;">
@@ -129,8 +155,8 @@
               <i class="fas fa-smile"></i>
             </button>
           </div>
-          <div class="input-wrapper" style="flex:1; margin: 0 1em;">
-            <input type="text" id="messageInput" class="message-input" placeholder="Type your message here..." aria-label="Type your message" style="width: 100%; padding: 0.75em; font-size: 1em; border: 1px solid #ccc; border-radius: 4px;" />
+          <div class="input-wrapper" style="flex:1; margin:0 1em;">
+            <input type="text" id="messageInput" class="message-input" placeholder="Type your message here..." aria-label="Type your message" style="width:100%; padding:0.75em; font-size:1em; border:1px solid #ccc; border-radius:4px;"/>
           </div>
           <div class="input-actions" style="display:flex; gap:0.5em;">
             <button class="btn btn-icon" id="recordBtn" title="Voice message" aria-label="Voice message" style="min-width:48px; min-height:48px;">
@@ -142,7 +168,7 @@
           </div>
         </div>
       </div>
-    </main>
+    </div>
   </div>
 
   <!-- Supabase SDK -->
@@ -154,7 +180,7 @@
     const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
     // Current chat info
-    let currentChatId = 'default-chat'; // should be set dynamically after selecting a chat
+    let currentChatId = 'default-chat'; // Set dynamically based on selection
     let currentChatName = 'John Farmer';
 
     // User info
@@ -170,9 +196,8 @@
       await populateChats();
     };
 
-    // Load previous messages (filter by conversation_id)
+    // Load previous messages filtered by conversation_id
     async function loadMessages() {
-      // Replace 'conversation_id' with your actual column name in your database
       const { data, error } = await supabase
         .from('messages')
         .select('*')
@@ -200,10 +225,10 @@
         console.error(error);
         return;
       }
-      // Deduplicate chats by user_id
       const uniqueChats = {};
       data.forEach(msg => {
         if (!uniqueChats[msg.user_id]) {
+          // Assuming message contains name and avatar info
           uniqueChats[msg.user_id] = {
             name: msg.name,
             avatar: msg.avatar,
@@ -218,19 +243,20 @@
         chatItem.className = 'chat-item';
         chatItem.setAttribute('data-chat-id', chat.user_id);
         chatItem.setAttribute('data-chat-name', chat.name);
+        chatItem.style.cursor = 'pointer';
         chatItem.innerHTML = `
-          <div class="chat-item-avatar">
+          <div class="chat-item-avatar" style="flex-shrink:0;">
             <img src="${chat.avatar}" alt="${chat.name}" style="width:50px; height:50px; border-radius:50%; object-fit:cover;">
           </div>
-          <div class="chat-item-content">
+          <div class="chat-item-content" style="margin-left:0.5em;">
             <div class="chat-item-header" style="display:flex; justify-content:space-between;">
-              <span class="chat-item-name">${chat.name}</span>
-              <span class="chat-item-time">Loading...</span>
+              <span class="chat-item-name" style="font-weight:bold;">${chat.name}</span>
+              <span class="chat-item-time" style="font-size:0.8em;">Loading...</span>
             </div>
-            <p class="chat-item-message">Last message preview...</p>
+            <p class="chat-item-message" style="margin:0; font-size:0.9em; color:#555;">Last message...</p>
           </div>`;
         chatItem.onclick = () => {
-          // switch chat
+          // Switch chat
           currentChatId = chat.user_id;
           currentChatName = chat.name;
           document.getElementById('chatHeaderName').textContent = chat.name;
@@ -243,7 +269,6 @@
     // Add message to chat UI
     function addMessageToChat(text, isUser, timestamp) {
       const messagesArea = document.getElementById('messagesArea');
-
       const messageDiv = document.createElement('div');
       messageDiv.className = `message ${isUser ? 'sent' : 'received'} animate-slide-in-right`;
       messageDiv.setAttribute('role', 'region');
@@ -271,7 +296,7 @@
 
       messageContent.appendChild(timeSpan);
       messageDiv.appendChild(messageContent);
-      document.getElementById('messagesArea').appendChild(messageDiv);
+      messagesArea.appendChild(messageDiv);
     }
 
     // Send message
@@ -289,7 +314,7 @@
           avatar: currentUser.avatar,
           content: text,
           created_at: new Date().toISOString(),
-          conversation_id: currentChatId  // ensure this field exists in your table
+          conversation_id: currentChatId // ensure this column exists
         }]);
 
       if (error) {
@@ -303,7 +328,7 @@
       input.value = '';
     });
 
-    // Send on Enter key
+    // Send message on Enter
     document.getElementById('messageInput').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
