@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kigezi Agronet | User Dashboard</title>
+<title>Kigezi Agronet</title>
 
 <!-- Fonts & Icons -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -336,6 +336,61 @@ main{
   font-size:.9rem;
 }
 
+/* ================= FOOTER ================= */
+@keyframes gradientBG {
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+
+footer{
+  background:linear-gradient(-45deg, #16a34a, #22c55e, #4ade80, #16a34a);
+  background-size:400% 400%;
+  animation: gradientBG 15s ease infinite;
+  padding:40px 24px;
+  margin-top:60px;
+  color:#fff;
+  transition:0.3s;
+  border-top:none;
+}
+
+footer .footer-grid{
+  max-width:1400px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:30px;
+}
+
+footer h3{
+  font-weight:700;
+  margin-bottom:12px;
+}
+
+footer p, footer a{
+  font-size:.9rem;
+  color:#f0fdf4;
+  text-decoration:none;
+  transition:0.3s;
+}
+
+footer a:hover{
+  color:#d9f99d;
+}
+
+footer .social a{
+  font-size:1.2rem;
+  color:#f0fdf4;
+  margin-right:12px;
+  display:inline-block;
+  transition:0.3s transform,color;
+}
+
+footer .social a:hover{
+  color:#d9f99d;
+  transform:scale(1.2);
+}
+
 /* ================= RESPONSIVE ================= */
 @media(max-width:900px){
   .nav-links{display:none; flex-direction: column; position:absolute; top:70px; left:0; width:100%; background:var(--surface); padding:10px 0; gap:12px; box-shadow:var(--shadow);}
@@ -369,7 +424,7 @@ main{
       <a href="buyers.html">Buyers</a>
       <a href="logistics.html">Logistics</a>
       <a href="market.html">Market</a>
-      <a href="charts.html">Charts</a>
+      <a href="chat.html">community chat</a>
     </nav>
 
     <div class="nav-actions">
@@ -381,7 +436,6 @@ main{
 </header>
 
 <main>
-
 <!-- TOP INFO -->
 <section class="top-info">
   <div class="info-card">
@@ -411,7 +465,7 @@ main{
 
 <!-- HERO -->
 <section class="hero">
-  <h1>Welcome back 👋</h1>
+  <h1>Welcome to Kigezi Agronet 👋</h1>
   <p>Manage your farming activities, markets, and logistics from one place.</p>
 </section>
 
@@ -425,10 +479,10 @@ main{
 
 <!-- STATS -->
 <section class="stats">
-  <div class="stat"><h3>Registered Farmers</h3><p>10,245</p></div>
-  <div class="stat"><h3>Active Buyers</h3><p>1,480</p></div>
-  <div class="stat"><h3>Logistics Providers</h3><p>86</p></div>
-  <div class="stat"><h3>Market Listings</h3><p>3,920</p></div>
+  <div class="farmers.html"><h3>Registered Farmers</h3><p>10,245</p></div>
+  <div class="buyers.html"><h3>Active Buyers</h3><p>1,480</p></div>
+  <div class="logistics.html"><h3>Logistics Providers</h3><p>86</p></div>
+  <div class="market.html"><h3>Market Listings</h3><p>3,920</p></div>
 </section>
 
 <!-- CONTENT -->
@@ -475,8 +529,48 @@ main{
     </div>
   </div>
 </section>
-
 </main>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <h3>Kigezi Agronet</h3>
+      <p>Your one-stop platform for managing farmers, buyers, logistics, and market activities efficiently in the Kigezi region.</p>
+    </div>
+
+    <div>
+      <h3>Quick Links</h3>
+      <ul style="list-style:none; padding:0;">
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="farmers.html">Farmers</a></li>
+        <li><a href="buyers.html">Buyers</a></li>
+        <li><a href="logistics.html">Logistics</a></li>
+        <li><a href="market.html">Market</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h3>Contact Us</h3>
+      <p>123 Kigezi Street, Kabale, Uganda</p>
+      <p>Email: support@kigeziagronet.com</p>
+      <p>Phone: +256 700 000 000</p>
+    </div>
+
+    <div>
+      <h3>Follow Us</h3>
+      <div class="social">
+        <a href="#"><i class="fab fa-facebook-f"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+      </div>
+    </div>
+  </div>
+  <div style="text-align:center; margin-top:30px; font-size:.8rem; color:#f0fdf4;">
+    &copy; 2026 Kigezi Agronet. All rights reserved.
+  </div>
+</footer>
 
 <script>
 // Theme toggle
@@ -515,6 +609,5 @@ hamburger.onclick = () => {
   navLinks.classList.toggle("show");
 };
 </script>
-
 </body>
 </html>
