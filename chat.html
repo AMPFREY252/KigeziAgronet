@@ -1,0 +1,312 @@
+﻿<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chat • Kigezi Agronet</title>
+  <meta name="description" content="Kigezi Agronet - Chat" />
+  <meta name="theme-color" content="#166534" />
+
+  <link rel="manifest" href="../manifest.webmanifest" />
+  <link rel="icon" href="../assets/images/favicon.ico" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/clean-layout.css" />
+  <link rel="stylesheet" href="../assets/css/enhanced-styles.css" />
+  <link rel="stylesheet" href="../assets/css/layouts.css" />
+  <link rel="stylesheet" href="../assets/css/chat-styles.css" />
+
+  <!-- Added CSS for message scroll -->
+  <style>
+    #messagesArea {
+      max-height: 60vh; /* Adjust height as needed */
+      overflow-y: auto; /* Enables vertical scrollbar */
+      display: flex;
+      flex-direction: column;
+    }
+  </style>
+</head>
+<body class="clean-layout">
+  <div class="container">
+    <!-- Back Button -->
+    <div class="page-top">
+      <a href="index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i>
+        <span>Back to Home</span>
+      </a>
+      <div class="page-menu">
+        <a href="market.html"><i class="fas fa-shopping-cart"></i> Market</a>
+        <a href="weather.html"><i class="fas fa-cloud-sun"></i> Weather</a>
+        <a href="pests.html"><i class="fas fa-bug"></i> Pest Alerts</a>
+        <a href="chat.html"><i class="fas fa-comments"></i> Chat</a>
+        <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+      </div>
+    </div>
+    <!-- Page Header -->
+    <header class="page-header">
+      <h1>Chat</h1>
+      <p class="page-description">Kigezi Agronet - Chat</p>
+    </header>
+    <!-- Toast Notification -->
+    <div id="toast"></div>
+    <main class="clean-content chat-container animate-fade-up">
+      <!-- Chat Sidebar -->
+      <div class="chat-sidebar">
+        <div class="sidebar-header">
+          <h2>Conversations</h2>
+          <button class="btn btn-icon" id="newChatBtn" title="Start new chat">
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
+
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="searchChats" placeholder="Search conversations..." />
+        </div>
+
+        <div class="chats-list" id="chatsList">
+          <!-- Conversations will be dynamically loaded here -->
+        </div>
+      </div>
+
+      <!-- Chat Main Area -->
+      <div class="chat-main">
+        <!-- Chat Header -->
+        <div class="chat-header">
+          <div class="chat-header-left">
+            <button class="btn btn-icon" id="backToList" style="display: none;">
+              <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="chat-header-info">
+              <h2 id="chatHeaderName">John Farmer</h2>
+              <div class="chat-header-status">
+                <span class="status-indicator online"></span>
+                <span id="chatHeaderStatus">Online</span>
+              </div>
+            </div>
+          </div>
+          <div class="chat-header-right">
+            <button class="btn btn-icon" title="Call">
+              <i class="fas fa-phone"></i>
+            </button>
+            <button class="btn btn-icon" title="Video Call">
+              <i class="fas fa-video"></i>
+            </button>
+            <button class="btn btn-icon" title="More options">
+              <i class="fas fa-ellipsis-v"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Messages Area -->
+        <div class="chat-messages" id="messagesArea">
+          <div class="message-date-separator"><span>Today</span></div>
+          <!-- Messages will be loaded here -->
+        </div>
+
+        <!-- Chat Input -->
+        <div class="chat-input-area">
+          <div class="input-actions">
+            <button class="btn btn-icon" id="attachBtn" title="Attach file"><i class="fas fa-paperclip"></i></button>
+            <button class="btn btn-icon" id="emojiBtn" title="Emoji"><i class="fas fa-smile"></i></button>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" id="messageInput" class="message-input" placeholder="Type your message here..." autocomplete="off" />
+          </div>
+          <div class="input-actions">
+            <button class="btn btn-icon" id="recordBtn" title="Voice message"><i class="fas fa-microphone"></i></button>
+            <button class="btn btn-primary btn-send" id="sendBtn" title="Send message"><i class="fas fa-paper-plane"></i></button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/supabase.min.js"></script>
+  <script>
+    // Initialize Supabase
+    const supabaseUrl = 'https://cevlgtwecychwxjnykgb.supabase.co';
+    const supabaseKey = 'sb_publishable_INoSTw7EHY_m2qOzfDHqhw_PMVRnpcc';
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    // Current chat info
+    let currentChatId = 'default-chat'; // replace or set dynamically
+    let currentChatName = 'John Farmer';
+
+    // User info
+    const currentUser = {
+      user_id: 'user-123',
+      name: 'John Farmer',
+      avatar: 'https://ui-avatars.com/api/?name=John+Farmer&background=166534&color=fff'
+    };
+
+    // Load messages and chats on page load
+    window.onload = async () => {
+      await loadMessages();
+      await populateChats();
+    };
+
+    // Load previous messages
+    async function loadMessages() {
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('id', currentChatId)
+        .order('created_at', { ascending: true });
+      
+      const messagesArea = document.getElementById('messagesArea');
+      messagesArea.innerHTML = '<div class="message-date-separator"><span>Today</span></div>';
+
+      if (!error && data) {
+        data.forEach(msg => {
+          addMessageToChat(msg.content, msg.user_id === currentUser.user_id, new Date(msg.created_at));
+        });
+      }
+      messagesArea.scrollTop = messagesArea.scrollHeight;
+    }
+
+    // Populate chat list
+    async function populateChats() {
+      const { data, error } = await supabase
+        .from('messages')
+        .select('id, name, avatar, user_id')
+        .limit(50);
+      if (error) {
+        console.error(error);
+        return;
+      }
+      const uniqueChats = {};
+      data.forEach(msg => {
+        if (!uniqueChats[msg.user_id]) {
+          uniqueChats[msg.user_id] = {
+            name: msg.name,
+            avatar: msg.avatar,
+            user_id: msg.user_id
+          };
+        }
+      });
+      const chatsList = document.getElementById('chatsList');
+      chatsList.innerHTML = '';
+      Object.values(uniqueChats).forEach(chat => {
+        const chatItem = document.createElement('div');
+        chatItem.className = 'chat-item';
+        chatItem.setAttribute('data-chat-id', chat.user_id);
+        chatItem.setAttribute('data-chat-name', chat.name);
+        chatItem.innerHTML = `
+          <div class="chat-item-avatar">
+            <img src="${chat.avatar}" alt="${chat.name}" />
+          </div>
+          <div class="chat-item-content">
+            <div class="chat-item-header">
+              <span class="chat-item-name">${chat.name}</span>
+              <span class="chat-item-time">Loading...</span>
+            </div>
+            <p class="chat-item-message">Last message preview...</p>
+          </div>`;
+        chatItem.onclick = () => {
+          // switch chat
+          currentChatId = chat.user_id;
+          currentChatName = chat.name;
+          document.getElementById('chatHeaderName').textContent = chat.name;
+          loadMessages();
+        };
+        chatsList.appendChild(chatItem);
+      });
+    }
+
+    // Add message to chat UI
+    function addMessageToChat(text, isUser, timestamp) {
+      const messagesArea = document.getElementById('messagesArea');
+
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${isUser ? 'sent' : 'received'} animate-slide-in-right`;
+
+      const messageContent = document.createElement('div');
+      messageContent.className = 'message-content';
+
+      const bubbleDiv = document.createElement('div');
+      bubbleDiv.className = 'message-bubble';
+
+      const p = document.createElement('p');
+      p.textContent = text;
+
+      bubbleDiv.appendChild(p);
+      messageContent.appendChild(bubbleDiv);
+
+      // Timestamp
+      const timeSpan = document.createElement('span');
+      timeSpan.className = 'message-time';
+      const hours = timestamp.getHours() % 12 || 12;
+      const minutes = timestamp.getMinutes().toString().padStart(2, '0');
+      const ampm = timestamp.getHours() >= 12 ? 'PM' : 'AM';
+      timeSpan.textContent = `${hours}:${minutes} ${ampm}`;
+
+      messageContent.appendChild(timeSpan);
+      messageDiv.appendChild(messageContent);
+      document.getElementById('messagesArea').appendChild(messageDiv);
+    }
+
+    // Send message
+    document.getElementById('sendBtn').addEventListener('click', async () => {
+      const input = document.getElementById('messageInput');
+      const text = input.value.trim();
+      if (text === '') return;
+
+      const { data, error } = await supabase
+        .from('messages')
+        .insert([{
+          id: generateUUID(),
+          user_id: currentUser.user_id,
+          name: currentUser.name,
+          avatar: currentUser.avatar,
+          content: text,
+          created_at: new Date().toISOString()
+        }]);
+
+      if (error) {
+        console.error('Error saving message:', error);
+        alert('Error sending message');
+        return;
+      }
+
+      addMessageToChat(text, true, new Date());
+      document.getElementById('messagesArea').scrollTop = document.getElementById('messagesArea').scrollHeight;
+      input.value = '';
+    });
+
+    // Send on Enter key
+    document.getElementById('messageInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('sendBtn').click();
+      }
+    });
+
+    // UUID generator
+    function generateUUID() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0,
+          v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+  </script>
+  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/chat.js"></script>
+  <script>
+    // Highlight current page in menu
+    document.addEventListener('DOMContentLoaded', () => {
+      const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+      document.querySelectorAll('.page-menu a').forEach(link => {
+        if (link.getAttribute('href') === currentPage) {
+          link.style.background = '#166534';
+          link.style.color = 'white';
+        }
+      });
+    });
+  </script>
+  <script src="../assets/js/theme-switcher.js"></script>
+</body>
+</html>
